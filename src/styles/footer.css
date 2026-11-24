@@ -1,0 +1,408 @@
+/* Stopka (Figma 1:708): trzy części – Top (logo, social, nawigacja), Bottom (płatności, nagrody, sklepy)
+   i Caption (informacja VAT, kontakt, logotypy). Statyczna, bez animacji poza hoverem linków
+   (transition `color` – udokumentowany wyjątek) i kółek social (warstwa ::before, opacity).
+   Figma nie definiuje stanów hover – dobrane własne. */
+
+.footer {
+  --footer-max: 1600px;
+  --footer-heading: 0.8125rem; /* 13px */
+
+  background: var(--color-white);
+  color: var(--color-text-dark);
+  font-size: var(--footer-heading);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.footer ul,
+.footer address {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-style: normal;
+}
+
+.footer h2 {
+  margin: 0;
+  font-size: var(--footer-heading);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.footer a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--t-fast) var(--ease);
+}
+
+.footer a:hover {
+  color: var(--color-btn-hover);
+  text-decoration: underline;
+}
+
+.footer a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.footer img {
+  display: block;
+}
+
+/* ---------- Top ---------- */
+
+.footer__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 48px;
+  box-sizing: border-box;
+  max-width: calc(var(--footer-max) + 32px);
+  margin-inline: auto;
+  padding: 96px 16px 64px;
+}
+
+.footer__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.footer__logo {
+  display: block;
+  width: 160px;
+  height: 44px;
+}
+
+.footer__logo:hover {
+  text-decoration: none;
+}
+
+.footer__logo img {
+  width: 160px;
+  height: 44px;
+}
+
+.footer__social {
+  display: flex;
+  gap: 2px;
+}
+
+.footer__social a {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.footer__social a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-border-light);
+  opacity: 0;
+  transition: opacity var(--t-btn) var(--ease);
+}
+
+.footer__social a:hover,
+.footer__social a:focus-visible {
+  text-decoration: none;
+}
+
+.footer__social a:hover::before,
+.footer__social a:focus-visible::before {
+  opacity: 1;
+}
+
+.footer__social img {
+  width: 24px;
+  height: 24px;
+}
+
+.footer__nav {
+  display: flex;
+  flex-wrap: wrap; /* przy wąskim desktopie kolumny łamią się do kolejnego wiersza zamiast rozpychać stronę */
+  gap: 40px 96px;
+  min-width: 0;
+}
+
+.footer__nav section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.footer__nav ul {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer__nav a {
+  white-space: nowrap;
+}
+
+/* ---------- Bottom ---------- */
+
+.footer__middle {
+  display: flex;
+  box-sizing: border-box;
+  max-width: calc(var(--footer-max) + 32px);
+  margin-inline: auto;
+  padding: 0 16px 16px;
+}
+
+.footer__middle > section {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 32px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.footer__middle > section:not(:last-child) {
+  border-inline-end: 1px solid var(--color-border-light);
+}
+
+.footer__middle > section:first-child {
+  padding-inline-start: 0;
+}
+
+.footer__middle > section:last-child {
+  padding-inline-end: 0;
+}
+
+.footer__middle ul {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Płatności: 5 kafli 57x36 w rzędzie (siatka 317 px), gap 8 px. */
+.footer__middle > section:first-child ul {
+  gap: 8px;
+  width: 317px;
+  max-width: 100%;
+  align-items: center;
+}
+
+.footer__middle > section:first-child li {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 57px;
+  height: 36px;
+  padding: 6px 7px;
+  border-radius: 4px;
+}
+
+.footer__middle > section:first-child img {
+  width: 43px;
+  height: 24px;
+  object-fit: cover;
+}
+
+/* Nagrody: stałe rozmiary z atrybutów width/height, gap 3 px. */
+.footer__middle > section:nth-child(2) ul {
+  gap: 3px;
+  width: 294px;
+  max-width: 100%;
+  align-items: flex-start;
+}
+
+.footer__middle > section:nth-child(2) img {
+  object-fit: cover;
+}
+
+/* Nasze sklepy: flagi 24 px w kółkach 32x32. */
+.footer__middle > section:last-child ul {
+  gap: 8px;
+  align-items: center;
+}
+
+.footer__middle > section:last-child a {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.footer__middle > section:last-child a:hover {
+  text-decoration: none;
+}
+
+.footer__middle > section:last-child img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+/* ---------- Caption ---------- */
+
+.footer__bottom {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px 32px;
+  box-sizing: border-box;
+  max-width: calc(var(--footer-max) + 48px);
+  margin-inline: auto;
+  padding: 32px 24px;
+  font-size: 0.75rem; /* 12px */
+}
+
+/* Elementy .footer__legal trafiają bezpośrednio do siatki Caption. */
+.footer__legal {
+  display: contents;
+}
+
+.footer__legal p {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+}
+
+/* Linia rozdzielająca między zdaniem o VAT a logotypami. */
+.footer__bottom::before {
+  content: '';
+  grid-column: 2;
+  grid-row: 1;
+  height: 1px;
+  background: var(--color-border-light);
+}
+
+.footer__credits {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  gap: 8px;
+}
+
+.footer__credits a {
+  display: block;
+}
+
+.footer__credits a:hover {
+  text-decoration: none;
+}
+
+.footer__credits img {
+  height: 36px;
+  width: auto;
+}
+
+.footer__credits li:last-child img {
+  border-radius: 2px;
+}
+
+.footer__legal address {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+}
+
+/* Telefon i godziny pracy trzymają się razem (odstęp 16 px). */
+.footer__legal address a[href^='tel:'] {
+  margin-inline-end: -8px;
+}
+
+/* ---------- Responsywność (Figma: tylko desktop) ---------- */
+
+@media (width <= 1280px) {
+  .footer__nav {
+    column-gap: 48px;
+  }
+}
+
+@media (width <= 1024px) {
+  .footer__top {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-block: 64px 48px;
+  }
+
+  .footer__brand {
+    align-items: flex-start;
+  }
+
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    gap: 40px 48px;
+  }
+
+  .footer__middle {
+    flex-direction: column;
+  }
+
+  .footer__middle > section,
+  .footer__middle > section:first-child,
+  .footer__middle > section:last-child {
+    padding: 32px 0;
+  }
+
+  .footer__middle > section:not(:last-child) {
+    border-inline-end: 0;
+  }
+
+  .footer__bottom {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-inline: 16px;
+  }
+
+  .footer__bottom::before {
+    display: none;
+  }
+
+  .footer__credits {
+    grid-column: 2;
+  }
+}
+
+@media (width <= 640px) {
+  .footer__nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px 24px;
+  }
+
+  .footer__nav a {
+    white-space: normal;
+  }
+
+  .footer__bottom {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .footer__legal p,
+  .footer__credits {
+    grid-column: 1;
+  }
+
+  .footer__credits {
+    grid-row: 3;
+  }
+
+  .footer__legal address {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer__legal address a[href^='tel:'] {
+    margin-inline-end: 0;
+  }
+}

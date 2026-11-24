@@ -1,0 +1,46 @@
+:root {
+  /* Easings */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);   /* domyślny */
+  --ease-out: cubic-bezier(0, 0, 0.2, 1); /* powiększenia */
+
+  /* Durations */
+  --t-fast: 250ms;    /* hover: 200-250 ms */
+  --t-slow: 600ms;    /* crossfade slidera, większe ruchy 500-800 ms */
+  --t-zoom: 800ms;    /* slider: scale(1.05 -> 1) */
+  --t-tile: 500ms;    /* kafelki: scale(1 -> 1.1) */
+  --t-btn: 200ms;     /* przycisk kafelka: #000 -> #4A4A4A */
+  --t-progress: 3s;   /* pasek postępu slidera (linear) */
+  --t-shader-loop: 25s; /* pełny cykl shadera CTA (czytane przez shader.ts) */
+
+  /* Layout */
+  --container: 1220px;
+  --gutter: max(24px, calc((100% - var(--container)) / 2));
+  --header-max: 1600px; /* max szerokość treści nagłówka */
+  --gutter-wide: max(16px, calc((100% - var(--header-max)) / 2)); /* pasek zalet: padding 16px, treść max 1600px (Figma) */
+
+  /* Kolory */
+  --color-white: #fff;
+  --color-black: #000;
+  --color-border-light: #e7e7e7; /* obramowanie wyszukiwarki */
+  --color-text-dark: #1e1e1e;    /* tekst na żółtym przycisku (Figma) */
+  --color-text-title: #101011;   /* tytuły zalet sklepu (Figma) */
+  --color-overlay-20: rgba(16, 16, 17, 0.2);  /* okrągły przycisk (Figma) */
+  --color-overlay-40: rgba(16, 16, 17, 0.4);  /* odznaka Trustmate (Figma), hover przycisku */
+  --color-progress-track: rgba(231, 231, 231, 0.5); /* nieaktywny segment paska postępu */
+
+  /* Przyciski */
+  --color-btn: var(--color-black);
+  --color-btn-hover: #4a4a4a;
+  --color-btn-yellow: #f2bf25;       /* Figma: przycisk hero */
+  --color-btn-yellow-hover: #f5cf5c; /* własny – Figma nie definiuje stanu hover */
+
+  /* Shader CTA (czytane też przez shader.ts) */
+  --color-shader-dark: #111111;
+  --color-shader-light: #f2c12e;
+
+  /* Kafelki (Figma 1:631) */
+  --tile-gap: 16px;
+  --color-tile-configurator: #72a3f3;
+  --color-tile-catalog: #fdf8eb;
+  --color-tile-smart: #e8e4df;
+}

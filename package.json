@@ -1,0 +1,19 @@
+{
+  "name": "idomods-rekrutacja",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsc && vite build && vite preview",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~7.0.2",
+    "vite": "^8.3.6"
+  },
+  "dependencies": {
+    "@fontsource-variable/red-hat-display": "^5.3.0"
+  }
+}

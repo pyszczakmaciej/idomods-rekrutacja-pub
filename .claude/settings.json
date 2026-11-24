@@ -1,0 +1,14 @@
+{
+  "enabledPlugins": {
+    "modern-web-guidance@googlechrome": true,
+    "figma@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "googlechrome": {
+      "source": {
+        "source": "github",
+        "repo": "GoogleChrome/modern-web-guidance"
+      }
+    }
+  }
+}

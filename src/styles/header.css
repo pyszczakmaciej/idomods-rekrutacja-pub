@@ -1,0 +1,411 @@
+/* Nagłówek: przezroczysty + biały tekst -> biały + czarny tekst na hover/focus.
+   Tło to ::before z animowanym opacity, kolor (tekst, ikony, logo) przez `color`
+   (wyjątek opisany w README). Ikony i logo to maski SVG wypełnione currentColor,
+   więc zmieniają kolor razem z tekstem. Ten sam czas i easing = zmiana jednoczesna. */
+
+.header {
+  --header-fg: var(--color-white);
+  --header-fg-active: var(--color-black);
+
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 10;
+  isolation: isolate;
+
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  box-sizing: border-box;
+  padding: 16px max(16px, calc((100% - var(--header-max)) / 2));
+
+  color: var(--header-fg);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  transition:
+    color var(--t-fast) var(--ease),
+    transform var(--t-slow) var(--ease);
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-white);
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease);
+}
+
+/* .is-scrolled (ustawiane w header.ts tylko na desktopie): po scrollu tło jak na hover */
+.header:hover,
+.header:focus-within,
+.header.is-scrolled {
+  color: var(--header-fg-active);
+}
+
+.header:hover::before,
+.header:focus-within::before,
+.header.is-scrolled::before {
+  opacity: 1;
+}
+
+/* Desktop: wrapper menu nie tworzy boxa, dzieci układają się w flexie headera */
+.header__menu {
+  display: contents;
+}
+
+.header__nav { order: 1; }
+.header__search { order: 2; }
+.header__actions { order: 3; }
+
+.header__burger,
+.header__close,
+.header__divider {
+  display: none;
+}
+
+.header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.header ul {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.header a:focus-visible,
+.header button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* Logo */
+.header__logo {
+  display: flex;
+  flex: none;
+}
+
+/* Nawigacja */
+.header__nav ul {
+  gap: 32px;
+}
+
+.header__nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* Podkreślenie wjeżdżające od lewej na hover/focus (tylko transform) */
+.header__nav a::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 -4px;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.header__nav a:hover::before,
+.header__nav a:focus-visible::before,
+.header__actions li:first-child a:hover::before,
+.header__actions li:first-child a:focus-visible::before {
+  transform: scaleX(1);
+}
+
+/* "Stwórz swoją lampę": ten sam efekt, kreska pod ikoną i tekstem (bez paddingu linku) */
+.header__actions li:first-child a {
+  position: relative;
+}
+
+.header__actions li:first-child a::before {
+  content: '';
+  position: absolute;
+  inset: auto 16px 7px;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+/* Chevron przy Lampy / Kolory / Pomieszczenia */
+.header__nav li:nth-child(-n + 3) > a::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: url(/assets/icons/angle-down.svg) center / contain no-repeat;
+  mask: url(/assets/icons/angle-down.svg) center / contain no-repeat;
+}
+
+/* Wyszukiwarka */
+.header__search {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 0;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 15px 24px; /* 16px w Figmie minus 1px obramowania */
+  border: 1px solid var(--color-border-light);
+  border-radius: 100px;
+}
+
+.header__search input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.header__search input::placeholder {
+  color: inherit;
+  opacity: 1;
+}
+
+.header__search input:focus-visible {
+  outline: none;
+}
+
+.header__search:focus-within {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.header__search button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Akcje */
+.header__actions {
+  flex: none;
+  gap: 8px;
+}
+
+.header__actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+}
+
+/* Konfigurator: ikona + tekst */
+.header__actions li:first-child a {
+  gap: 9px;
+  padding: 11px 16px;
+  font-size: 0.8125rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* Konto / koszyk: okrągłe przyciski 48px */
+.header__actions li:not(:first-child) a {
+  position: relative;
+  isolation: isolate;
+  width: 48px;
+  height: 48px;
+}
+
+/* Szare tło: currentColor z niską opacity, więc pasuje do obu stanów headera */
+.header__actions li:not(:first-child) a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease);
+}
+
+.header__actions li:not(:first-child) a:hover::before,
+.header__actions li:not(:first-child) a:focus-visible::before {
+  opacity: 0.1;
+}
+
+/* Węższy desktop: mniejsze odstępy, żeby pasek się mieścił */
+@media (1440px <= width < 1600px) {
+  .header {
+    gap: 32px;
+  }
+}
+
+/* Większy tablet / wąski laptop: 1024-1439px. Górny rząd: logo, search, akcje;
+   dolny rząd: nawigacja. (Poniżej 1024px działa hamburger.) */
+@media (1024px <= width < 1440px) {
+  .header {
+    flex-wrap: wrap;
+    gap: 16px 32px;
+  }
+
+  .header__search {
+    order: 1;
+  }
+
+  .header .header__actions {
+    order: 2;
+  }
+
+  .header__nav {
+    order: 3;
+    flex: 0 0 100%;
+  }
+}
+
+/* Mobile / tablet: poniżej 1024px (desktop-first, brak designu mobilnego).
+   Header: logo + konto + koszyk + hamburger; reszta w panelu z prawej. */
+@media (width < 1024px) {
+  .header {
+    gap: 0;
+    padding-block: 12px;
+  }
+
+  /* Brak białego paska na hover/focus – na dotyku hover „przykleja się" */
+  .header:hover,
+  .header:focus-within {
+    color: var(--header-fg);
+  }
+
+  .header:hover::before,
+  .header:focus-within::before {
+    opacity: 0;
+  }
+
+  /* Scroll w dół: header ucieka w górę (tylko transform), visibility z opóźnieniem
+     chowa go przed fokusem; powrót na górę wsuwa go z animacją. */
+  .header.is-hidden {
+    transform: translateY(-100%);
+    visibility: hidden;
+    transition:
+      color var(--t-fast) var(--ease),
+      transform var(--t-slow) var(--ease),
+      visibility 0s linear var(--t-slow);
+  }
+
+  /* `.header ul { margin: 0 }` ma wyższą specyficzność, stąd `.header` w selektorze */
+  .header .header__actions {
+    order: 0;
+    margin-inline-start: auto;
+  }
+
+  .header__actions li:first-child {
+    display: none;
+  }
+
+  .header__burger,
+  .header__close {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* Panel: pełny ekran, wjazd z prawej (tylko transform) */
+  .header__menu {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-sizing: border-box;
+    padding: 12px 16px 32px;
+    overflow-y: auto;
+    background: var(--color-white);
+    color: var(--color-black);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform var(--t-slow) var(--ease),
+      visibility 0s linear var(--t-slow);
+  }
+
+  .header__menu.is-open {
+    transform: none;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  /* Ikona 24px w polu 48px: ujemny margines dosuwa ją do krawędzi 16px */
+  .header__burger {
+    margin-inline-end: -12px;
+  }
+
+  .header__close {
+    align-self: flex-end;
+    margin-inline-end: -12px;
+  }
+
+  .header__search,
+  .header__nav {
+    order: 0;
+  }
+
+  .header__search {
+    flex: none;
+  }
+
+  .header__divider {
+    display: block;
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--color-border-light);
+  }
+
+  .header__nav ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .header__nav a {
+    justify-content: space-between;
+    padding: 16px 0;
+    font-size: 1rem;
+  }
+
+  /* Chevron po prawej stronie wiersza */
+  .header__nav li:nth-child(-n + 3) > a::after {
+    order: 1;
+  }
+}
+
+/* Reduced motion: wyłączamy tylko ruch (chowanie nagłówka, wjazd panelu).
+   Zmiana koloru i tła (opacity) zostaje – to nie jest ruch przestrzenny. */
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition-property: color;
+  }
+
+  .header.is-hidden,
+  .header__menu,
+  .header__nav a::before,
+  .header__actions li:first-child a::before {
+    transition: none;
+  }
+}

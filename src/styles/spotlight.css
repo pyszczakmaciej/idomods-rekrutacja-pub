@@ -1,0 +1,43 @@
+/* Ciemność odkrywana światłem białej lampy (rysuje spotlight.ts).
+   Canvas powstaje tylko w JS, więc bez JS strona jest w pełni widoczna.
+   Animujemy wyłącznie opacity; ruch kursora obsługuje canvas. */
+.spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: 100; /* nad nagłówkiem (z-index: 10) */
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity; /* własna warstwa kompozytora: redraw canvasa nie rusza reszty strony */
+  transition: opacity var(--t-slow) var(--ease);
+}
+
+.spotlight.is-active {
+  opacity: 1;
+}
+
+/* Stożek światła: element DOM, wygląd jak .hero__lamp-cone w hero.css (kształt, gradient
+   0.6 -> 0 na 90%, screen). Rozmiar bazowy i pozycję (translate / rotate / scale) ustawia
+   spotlight.ts; wierzchołek stożka to środek górnej krawędzi (transform-origin). */
+.spotlight-cone {
+  position: fixed;
+  top: 0;
+  z-index: 101; /* nad ciemnością, żeby światło nie było przez nią przyciemnione */
+  transform-origin: 50% 0;
+  pointer-events: none;
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--lamp-color, 255, 236, 190), 0.6),
+    transparent 90%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  will-change: translate, rotate, scale;
+  transition: opacity var(--t-slow) var(--ease);
+}
+
+.spotlight-cone.is-active {
+  opacity: 1;
+}

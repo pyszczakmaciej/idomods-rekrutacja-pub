@@ -1,0 +1,204 @@
+/* Kafelki (Figma 1:631): sam CSS. Siatka 1600 px = 648 + 936 / 936 + 648, odstęp 16 px,
+   wysokość 518 px. Na hover/focus-within obraz (.tile__media) skaluje się 1 -> 1.1
+   (500 ms, ease-out, overflow: hidden na kafelku). Zmianę koloru przycisku obsługuje
+   components.css (.tile:hover .button--dark). Animowany jest wyłącznie transform. */
+
+.tiles {
+  display: grid;
+  grid-template-columns: 648fr 272fr 648fr;
+  gap: var(--tile-gap);
+  padding: 0 var(--gutter-wide) 64px;
+}
+
+.tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: clamp(300px, 24.7vw, 395px); /* 395 px przy 1600 px, skaluje się razem z siatką */
+  border-radius: clamp(16px, 1.5vw, 24px);
+  background: var(--tile-bg);
+  color: var(--color-text-title);
+}
+
+/* Wiersz 1: 648 + 936, wiersz 2: 936 + 648. Wysokość wiersza (518 px przy 1584 px)
+   wyznacza szeroki kafelek, wąski się rozciąga. */
+.tile--configurator,
+.tile--catalog {
+  aspect-ratio: 936 / 518;
+}
+
+/* Trzy ścieżki 648 + 272 + 648 (+ 2 × 16 gap) pozwalają uzyskać oba układy:
+   wiersz 1: 648 | 936 (272 + 16 + 648), wiersz 2: 936 (648 + 16 + 272) | 648. */
+.tile--thoro { grid-column: 1; }
+.tile--configurator { grid-column: 2 / 4; }
+.tile--catalog { grid-column: 1 / 3; }
+.tile--smart { grid-column: 3; }
+
+.tile--thoro { color: var(--color-white); }
+.tile--configurator { --tile-bg: var(--color-tile-configurator); --tile-fade: 38%; color: var(--color-white); }
+.tile--catalog { --tile-bg: var(--color-tile-catalog); --tile-fade: 62%; }
+.tile--smart { --tile-bg: var(--color-tile-smart); --tile-fade: 50%; }
+
+/* Rozmycie pod obrazem: gradient od koloru tła kafelka (1% krycia) do 100% krycia.
+   Leży nad obrazem, pod tekstem, i jest nieruchome (nie skaluje się z obrazem). */
+.tile--configurator::after,
+.tile--catalog::after,
+.tile--smart::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: var(--tile-fade);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--tile-bg) 1%, transparent),
+    var(--tile-bg)
+  );
+  pointer-events: none;
+}
+
+/* Warstwa obrazu – to ją skalujemy, więc działa też dla kilku obrazów (SMART). */
+.tile__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  transform: scale(1);
+  transition: transform var(--t-tile) var(--ease-out);
+  will-change: transform;
+}
+
+.tile:hover .tile__media,
+.tile:focus-within .tile__media {
+  transform: scale(1.1);
+}
+
+.tile__media img {
+  position: absolute;
+  display: block;
+  height: auto;
+}
+
+/* THORO: zdjęcie wypełnia cały kafelek */
+.tile--thoro .tile__media img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Konfigurator: laptop z paletą (jeden plik), wychodzi lekko nad górną krawędź */
+.tile--configurator .tile__media img {
+  top: -1%;
+  left: 36%;
+  width: 64%;
+}
+
+/* Katalog: tablet po prawej, dłoń sięga dolnej krawędzi, całość przygaszona gradientem */
+.tile--catalog .tile__media img {
+  top: 10.5%;
+  left: 45%;
+  width: 52%;
+}
+
+/* SMART: dwa telefony */
+.tile__phone--back {
+  top: 15%;
+  left: 13%;
+  width: 34%;
+  /* Dolna krawędź tego pliku jest ucięta w środku kafelka – wygaszamy ją maską. */
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+
+.tile__phone--front {
+  top: 19%;
+  left: 38%;
+  width: 60%;
+}
+
+.tile__content {
+  --tile-inner-gap: clamp(16px, 1.5vw, 24px);
+
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--tile-inner-gap);
+  box-sizing: border-box;
+  padding: clamp(24px, 3vw, 48px);
+}
+
+.tile__content p,
+.tile__content h2 {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.tile__content p {
+  margin-bottom: calc(var(--tile-inner-gap) / -2); /* połowa gapu: 12 px między p i h2 przy 1600 px */
+  font-size: clamp(1rem, 1.3125vw, 1.3125rem); /* 21px przy 1600 px */
+}
+
+.tile__content h2 {
+  font-size: clamp(1.375rem, 2vw, 2rem); /* 32px przy 1600 px */
+}
+
+@media (width <= 900px) {
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+
+  .tile--thoro,
+  .tile--configurator,
+  .tile--catalog,
+  .tile--smart {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .tile--configurator,
+  .tile--catalog {
+    aspect-ratio: auto;
+  }
+
+  .tile {
+    min-height: 440px;
+  }
+
+  .tile__content {
+    padding: 24px;
+  }
+
+  .tile__content p {
+    font-size: 1rem;
+  }
+
+  .tile__content h2 {
+    font-size: clamp(1.375rem, 5.5vw, 1.625rem);
+  }
+
+  .tile--configurator .tile__media img,
+  .tile--catalog .tile__media img {
+    width: 80%;
+    left: auto;
+    right: 0;
+    top: 4%;
+  }
+
+  .tile--catalog .tile__media img {
+    top: auto;
+    bottom: 38%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile__media {
+    transition: none;
+  }
+
+  .tile:hover .tile__media,
+  .tile:focus-within .tile__media {
+    transform: none;
+  }
+}

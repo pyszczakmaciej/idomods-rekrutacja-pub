@@ -1,0 +1,381 @@
+/* Hero banner: slider (slajdy nałożone na siebie, crossfade), lampy, tekst i przycisk.
+   Parallaxa lamp dojdzie później. Logika slidera: src/slider.ts. */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  /* 16:9 od szerokości, ale w granicach 480px – 100dvh (bez aspect-ratio,
+     żeby max/min-height nigdy nie wpływały na szerokość). */
+  height: clamp(480px, 56.25vw, 100dvh);
+}
+
+.hero__slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Crossfade 600 ms; visibility opóźnione, żeby nieaktywny slajd znikał po zaniku. */
+.hero__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--t-slow) var(--ease),
+    visibility 0s linear var(--t-slow);
+}
+
+.hero__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.hero__slide > article {
+  width: 100%;
+  height: 100%;
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.05);
+  transition: transform var(--t-zoom) var(--ease-out);
+}
+
+.hero__slide.is-active .hero__bg {
+  transform: scale(1);
+}
+
+/* Treść: wyśrodkowana w pionie, wyrównana do lewej krawędzi kontenera.
+   Odstępy z Figmy: eyebrow -> tytuł 16px, tytuł -> przycisk 32px. */
+.hero__content {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--gutter);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
+  padding-block: 64px;
+  color: var(--color-white);
+  z-index: 1; /* nad lampami (ceglasta lampa wchodzi pod treść – zgodnie z Figmą) */
+}
+
+.hero__content p {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.hero__content h1,
+.hero__content h2 {
+  font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5rem); /* 56px na desktopie */
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hero__content .button {
+  margin-top: 16px; /* + gap 16px = 32px */
+  padding: 16px 24px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Strzałki slidera: 72px od krawędzi, wyśrodkowane w pionie (wygląd w .circle-button). */
+.hero__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  translate: 0 -50%;
+}
+
+.hero__arrow--prev { left: 72px; }
+.hero__arrow--next { right: 72px; }
+
+/* Strzałki tylko na desktopie z myszą. Poniżej 1024px oraz na urządzeniach dotykowych
+   (także dużych tabletach, np. iPad Pro) slider działa bez strzałek, sterowany swipe'm (slider.ts) */
+@media (width < 1024px), (hover: none), (pointer: coarse) {
+  .hero {
+    touch-action: pan-y; /* poziomy gest dla slidera, pionowy dla scrolla */
+  }
+
+  .hero__arrow {
+    display: none;
+  }
+}
+
+/* Pasek postępu: segmenty 64x2, wypełnienie to scaleX na <span>.
+   Aktywny segment wypełnia się liniowo przez --t-progress; koniec animacji
+   przełącza slajd (slider.ts). Pauza: .is-paused na .hero. */
+.hero__progress {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero__progress li {
+  width: 64px;
+  height: 2px;
+  overflow: hidden;
+  background: var(--color-progress-track);
+}
+
+.hero__progress span {
+  display: block;
+  height: 100%;
+  background: var(--color-btn-yellow);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.hero__progress li.is-done span {
+  transform: scaleX(1);
+}
+
+.hero__progress li.is-active span {
+  animation: hero-progress var(--t-progress) linear forwards;
+}
+
+.hero.is-paused .hero__progress li.is-active span {
+  animation-play-state: paused;
+}
+
+@keyframes hero-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__slide {
+    transition-duration: 0s;
+  }
+
+  .hero__bg {
+    transform: none;
+    transition: none;
+  }
+
+  .hero__progress li.is-active span {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+/* Odznaka Trustmate (prawy dolny róg). */
+.hero__rating {
+  position: absolute;
+  right: 72px;
+  bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 100px;
+  background: var(--color-overlay-40);
+  color: var(--color-white);
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.hero__rating-score {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.hero__rating-score strong {
+  font-size: 1.3125rem; /* 21px */
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* Ramka 20x20 z Figmy; gwiazdka (14.17x16.67) przesunięta o inset 7.9% / 16.67%. */
+.hero__rating-star {
+  position: relative;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.hero__rating-star img {
+  position: absolute;
+  top: 7.9%;
+  left: 16.67%;
+  width: 14.1667px;
+  height: 16.6667px;
+}
+
+@media (width <= 640px) {
+  .hero__rating {
+    right: 16px;
+    bottom: 56px; /* nad paskiem postępu, żeby się nie nakładały */
+  }
+}
+
+/* Lampy: warstwa o proporcjach tła, skalowana jak object-fit: cover,
+   więc lampy trzymają się kamienia przy każdym rozmiarze hero.
+   Pozycje zmierzone z ramki Figmy 1:506 (1920x1080), w % warstwy;
+   uwzględniają przezroczyste marginesy plików. Parallaxę doda hero-lamps.ts
+   (transform na <li>, pozycja zostaje w left/top). */
+.hero__lamps {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  aspect-ratio: 2730 / 1536; /* = hero-background.webp */
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+
+.hero__lamp {
+  --lamp-color: 255, 236, 190; /* RGB światła, nadpisywane per lampa */
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  container-type: inline-size; /* jednostki cqw = % szerokości lampy */
+}
+
+.hero__lamp:focus-visible {
+  outline: 2px solid var(--color-btn-yellow);
+  outline-offset: 4px;
+}
+
+.hero__lamp img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Źródło światła = eliptyczny dyfuzor („żarówka") na froncie klosza.
+   Per lampa (pozycja środka w % lampy, wymiary w cqw = % szerokości lampy):
+   --bx/--by środek dyfuzora, --bw/--bh osie elipsy, --rot obrót elipsy
+   (stożek obraca się razem z nią), --cone-w/--halo rozmiar stożka i poświaty. */
+.hero__lamp--white {
+  left: 39.8%; top: 7.6%; width: 18.9%;
+  --lamp-color: 255, 240, 205;
+  --bx: 60%; --by: 68%; --bw: 75cqw; --bh: 44cqw; --rot: -26deg;
+  --cone-w: 150cqw; --halo: 120cqw;
+}
+.hero__lamp--orange {
+  left: 21.7%; top: 40.1%; width: 21.8%;
+  --lamp-color: 255, 170, 100;
+  --bx: 62%; --by: 71%; --bw: 70cqw; --bh: 36cqw; --rot: -31deg;
+  --cone-w: 150cqw; --halo: 120cqw;
+}
+.hero__lamp--green {
+  left: 56.2%; top: 31.3%; width: 23.2%;
+  --lamp-color: 225, 235, 150;
+  --bx: 20%; --by: 81%; --bw: 40cqw; --bh: 22cqw; --rot: 25deg;
+  --cone-w: 110cqw; --halo: 80cqw;
+}
+
+/* Zapalanie: tylko opacity. Warstwy używają mix-blend-mode: screen. */
+.hero__lamp-light {
+  position: absolute;
+  left: var(--bx);
+  top: var(--by);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.hero__lamp-light > * {
+  position: absolute;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity var(--t-slow) var(--ease);
+}
+
+/* Rozświetlony dyfuzor (elipsa nałożona na kloszu). */
+.hero__lamp-bulb {
+  width: var(--bw);
+  height: var(--bh);
+  translate: -50% -50%;
+  rotate: var(--rot);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    #fff 0%,
+    #fff 35%,
+    rgb(var(--lamp-color)) 82%, /* pełne krycie aż prawie do krawędzi */
+    rgba(var(--lamp-color), 0) 100%
+  );
+}
+
+/* Poświata (bloom) wokół dyfuzora. */
+.hero__lamp-halo {
+  width: var(--halo);
+  height: var(--halo);
+  translate: -50% -50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(var(--lamp-color), 0.55),
+    rgba(var(--lamp-color), 0.18) 55%,
+    transparent
+  );
+}
+
+/* Stożek wychodzi ze środka dyfuzora, prostopadle do jego płaszczyzny. */
+.hero__lamp-cone {
+  width: var(--cone-w);
+  height: calc(var(--cone-w) * 1.4);
+  translate: -50% 0;
+  rotate: var(--rot);
+  transform-origin: 50% 0;
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--lamp-color), 0.6),
+    transparent 90%
+  );
+}
+
+.hero__lamp.is-on .hero__lamp-light > * {
+  opacity: 1;
+}
+
+/* Biała lampa śledząca kursor (.is-tracking ustawia hero-lamps.ts): obrót
+   (właściwość rotate, transform zostaje dla parallaxy) wokół żarówki, więc
+   stożek i glow dziedziczą kąt. Ciemność nad stroną rysuje spotlight.ts. */
+.hero__lamp.is-tracking {
+  transform-origin: var(--bx) var(--by);
+  will-change: rotate;
+}
+
+/* Stożek śledzącej lampy to osobny element fixed (.spotlight-cone, spotlight.ts):
+   musi wychodzić poza hero i kończyć się przy kursorze. */
+.hero__lamp.is-tracking .hero__lamp-cone {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__lamp-light > * {
+    transition-duration: 0s;
+  }
+}
